@@ -12,21 +12,17 @@ let subscribers = [];
 
 router.get('/subscribe', async (ctx, next) => {
   let message;
-  const promise = new Promise((resolved, failed) => {
+  const promise = new Promise((resolved) => {
     subscribers.push(resolved);
 
     ctx.res.on('close', function() {
       subscribers.splice(subscribers.indexOf(resolved), 1);
-      const error = new Error('Connection closed');
-      error.code = 'ECONNRESET';
-      failed(error);
     });
   });
 
   try {
     message = await promise;
   } catch (e) {
-    if (e.code === 'ECONNRESET') return;
     throw e;
   }
 
